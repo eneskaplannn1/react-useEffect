@@ -61,13 +61,20 @@ const key = "a0449c40";
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
-  
+
   const [query, setQuery] = useState("");
 
-  const [selectedMovie, setSelectedMovie] = useState();
+  const [selectedID, setSelectedID] = useState();
 
   const [isLoading, setIsLoading] = useState(false);
   const [Error, setError] = useState(false);
+
+  const handleClick = async (id) => {
+    selectedID === id ? setSelectedID(null) : setSelectedID(id);
+  };
+  const handleCloseMovie = () => {
+    setSelectedID(null);
+  };
 
   useEffect(() => {
     async function Fetch() {
@@ -103,19 +110,21 @@ export default function App() {
         <Box>
           {isLoading && <Loader />}
           {!isLoading && !Error && (
-            <MovieList movies={movies} onSelected={setSelectedMovie} />
+            <MovieList movies={movies} onSelected={handleClick} />
           )}
           {Error && <sendError message={Error} />}
         </Box>
 
         <Box>
-          {!selectedMovie && (
+          {!selectedID && (
             <>
               <WatchedSummary watched={watched} />
               <WatchedMovieList watched={watched} />
             </>
           )}
-          {selectedMovie && <MovieDetail movie={selectedMovie} />}
+          {selectedID && (
+            <MovieDetail id={selectedID} onCloseMovie={handleCloseMovie} />
+          )}
         </Box>
       </Main>
     </>
