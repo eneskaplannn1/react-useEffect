@@ -1,6 +1,7 @@
 import Movie from "./movie";
 
 export default function MovieList({ movies, onSelected }) {
+  console.log(movies);
   return (
     <>
       <ul className="list list-movies">

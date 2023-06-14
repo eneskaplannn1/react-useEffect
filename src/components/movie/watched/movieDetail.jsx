@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Loader from "../../Main/loader";
 import StarRating from "../../../starRating";
+import { FadeLoader } from "react-spinners";
 
 const key = "a0449c40";
 
@@ -14,8 +14,7 @@ export default function MovieDetail({
   const [isLoading, setIsLoading] = useState(false);
 
   const [isRated, setIsRated] = useState(false);
-  console.log(watched);
-  const isWatched = watched.map((movie) => movie.imdbID).includes(id);
+  const isWatched = watched?.map((movie) => movie.imdbID).includes(id);
   useEffect(() => {
     async function FetchMovie() {
       setIsLoading(true);
@@ -27,8 +26,18 @@ export default function MovieDetail({
 
     FetchMovie();
   }, [id]);
-
-  const content = isLoading && <Loader />;
+  const content = isLoading && (
+    <>
+      <FadeLoader
+        color={"red"}
+        loading={isLoading}
+        size={400}
+        aria-label="PulseLoader"
+        data-testid="PulseLoader"
+      />
+      <h1>Loading...</h1>
+    </>
+  );
 
   const handleUserRating = (rating) => {
     const newMovie = { ...movie, userRating: rating };

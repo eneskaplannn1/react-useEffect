@@ -5,31 +5,31 @@ import WatchedMovieList from "./components/movie/watched/WatchedMovieList";
 import Navbar from "./components/navbar/navBar";
 import Box from "./components/Main/Box";
 import Main from "./components/Main/Main";
-import Loader from "./components/Main/loader";
 import MovieDetail from "./components/movie/watched/movieDetail";
+import { FadeLoader } from "react-spinners";
 
-const key = "a0449c40";
+document.title = "usePopcorn";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [query, setQuery] = useState("");
-
-  const [selectedID, setSelectedID] = useState();
+  // const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(function () {
+    const storedValue = localStorage.getItem("movies");
+    return JSON.parse(storedValue);
+  });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [Error, setError] = useState(false);
 
-  const handleClick = async (id) => {
+  const [selectedID, setSelectedID] = useState();
+  const curMovie = movies?.find((movie) => movie?.imdbID === selectedID);
+
+  const handleSelectMovie = async (id) => {
     selectedID === id ? setSelectedID(null) : setSelectedID(id);
   };
-
   const handleCloseMovie = () => {
     setSelectedID(null);
   };
-
   const handleAddWatched = (movie) => {
-    console.log(movie);
     const newWatchedMovie = {
       imdbID: movie.imdbID,
       title: movie.Title,
@@ -42,49 +42,44 @@ export default function App() {
     setWatched((prev) => [...prev, newWatchedMovie]);
     setSelectedID(null);
   };
-
   const handleRemoveWatched = (id) => {
     const newWatched = watched.filter((movie) => movie.imdbID !== id);
     setWatched(newWatched);
   };
 
   useEffect(() => {
-    async function Fetch() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${key}&s=${query}`
-        );
-        if (!res.ok) throw new Error("Something wrong with API");
-        const data = await res.json();
+    if (!curMovie?.Title) return;
+    document.title = `Movie || ${curMovie?.Title}`;
 
-        if (!data.Response) throw new Error("Movie not found");
-        setMovies(data.Search);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+    return function () {
+      document.title = "usePopcorn";
+    };
+  }, [curMovie?.Title]);
 
-    Fetch().catch((err) => {
-      setError(
-        "Network error: Failed to fetch movies. Please try again later."
-      );
-      setIsLoading(false);
-    });
-  }, [query]);
-
+  useEffect(() => {
+    localStorage.setItem("movies", JSON.stringify(watched));
+  }, [watched]);
   return (
     <Fragment>
-      <Navbar movies={movies} query={query} setQuery={setQuery} />
+      <Navbar
+        movies={movies}
+        setMovies={setMovies}
+        setIsLoading={setIsLoading}
+      />
       <Main>
         <Box>
-          {isLoading && <Loader />}
-          {!isLoading && !Error && (
-            <MovieList movies={movies} onSelected={handleClick} />
+          {isLoading && (
+            <FadeLoader
+              color={"red"}
+              loading={isLoading}
+              size={150}
+              aria-label="PulseLoader"
+              data-testid="PulseLoader"
+            />
           )}
-          {Error && <sendError message={Error} />}
+          {!isLoading && (
+            <MovieList movies={movies} onSelected={handleSelectMovie} />
+          )}
         </Box>
         <Box>
           {!selectedID && (
