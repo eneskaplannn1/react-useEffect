@@ -6,11 +6,10 @@ const containerStyle = {
 };
 const starContainerStyle = {
   display: "flex",
-  color: "yellow",
 };
 
-export default function StarRating({ maxRating }) {
-  const [rating, setRating] = useState();
+export default function StarRating({ maxRating, handleRate }) {
+  const [rating, setRating] = useState(null);
   const [tempRating, setTempRating] = useState();
 
   return (
@@ -21,10 +20,10 @@ export default function StarRating({ maxRating }) {
             <Star
               onHandleClick={() => {
                 setRating(i + 1);
+                handleRate(i + 1);
               }}
               key={i}
               handleMouseEnter={() => {
-                console.log(1);
                 setTempRating(i + 1);
               }}
               handleMouseLeave={() => {
@@ -35,7 +34,9 @@ export default function StarRating({ maxRating }) {
           );
         })}
       </div>
-      <p>{tempRating ? tempRating : rating}</p>
+      <p style={{ color: "yellow", fontSize: "1.5rem", margin: "0 5px" }}>
+        {tempRating ? tempRating : rating}
+      </p>
     </div>
   );
 }
@@ -45,7 +46,7 @@ function Star({ onHandleClick, full, handleMouseLeave, handleMouseEnter }) {
       onClick={onHandleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{ height: "48px", width: "48px" }}
+      style={{ height: "36px", width: "36px" }}
     >
       {full ? (
         <svg

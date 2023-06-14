@@ -4,10 +4,18 @@ import StarRating from "../../../starRating";
 
 const key = "a0449c40";
 
-export default function MovieDetail({ id, onCloseMovie }) {
+export default function MovieDetail({
+  id,
+  onCloseMovie,
+  onAddWatched,
+  watched,
+}) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isRated, setIsRated] = useState(false);
+  console.log(watched);
+  const isWatched = watched.map((movie) => movie.imdbID).includes(id);
   useEffect(() => {
     async function FetchMovie() {
       setIsLoading(true);
@@ -20,12 +28,18 @@ export default function MovieDetail({ id, onCloseMovie }) {
     FetchMovie();
   }, [id]);
 
-  const content = isLoading && Loader;
+  const content = isLoading && <Loader />;
+
+  const handleUserRating = (rating) => {
+    const newMovie = { ...movie, userRating: rating };
+    onAddWatched(newMovie);
+    setIsRated(true);
+  };
 
   return (
     content || (
       <>
-        <div className="detail">
+        <div className="details">
           <header>
             <button className="btn-back" onClick={onCloseMovie}>
               &larr;
@@ -45,7 +59,21 @@ export default function MovieDetail({ id, onCloseMovie }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} />
+              {!isWatched ? (
+                <>
+                  <StarRating maxRating={10} handleRate={handleUserRating} />
+                  {isRated && (
+                    <button
+                      onClick={() => onAddWatched(movie)}
+                      className="btn-add"
+                    >
+                      Add to the list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>you rated this movie</p>
+              )}
             </div>
             <p>
               <em>{movie.Plot}</em>
