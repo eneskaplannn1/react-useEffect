@@ -7,17 +7,15 @@ import Box from "./components/Main/Box";
 import Main from "./components/Main/Main";
 import MovieDetail from "./components/movie/watched/movieDetail";
 import { FadeLoader } from "react-spinners";
+import useLocalStorage from "./useLocalStorage";
 
 document.title = "usePopcorn";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   // const [watched, setWatched] = useState([]);
-  const [watched, setWatched] = useState(function () {
-    const storedValue = localStorage.getItem("movies");
-    return JSON.parse(storedValue);
-  });
 
+  const [watched, setWatched] = useLocalStorage([], "watched");
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedID, setSelectedID] = useState();
@@ -56,9 +54,6 @@ export default function App() {
     };
   }, [curMovie?.Title]);
 
-  useEffect(() => {
-    localStorage.setItem("movies", JSON.stringify(watched));
-  }, [watched]);
   return (
     <Fragment>
       <Navbar

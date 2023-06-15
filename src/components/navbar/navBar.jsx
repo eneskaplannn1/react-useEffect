@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const key = "a0449c40";
 export default function Navbar({ movies, setMovies, setIsLoading }) {
   const [query, setQuery] = useState();
-
   const inputEl = useRef(null);
 
   useEffect(function () {
